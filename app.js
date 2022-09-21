@@ -17,6 +17,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
+//временный позьзователь
 app.use((req, res, next) => {
   req.user = {
     _id: '631b9b37bfc4eaa93a13a06a',
