@@ -32,6 +32,6 @@ app.all('/*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-undef
+  // eslint-disable-next-line no-undef, no-console
   console.log(`Сервер запущен на порту ${PORT}`);
 });
