@@ -10,5 +10,4 @@ routerCards.delete('/cards/:cardId', delCard);
 routerCards.put('/cards/:cardId/likes', likeCard);
 routerCards.delete('/cards/:cardId/likes', dislikeCard);
 
-
 module.exports = routerCards;
