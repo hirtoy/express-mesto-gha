@@ -31,5 +31,6 @@ app.all('/*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
+  // eslint-disable-next-line no-undef
+  myConsole.log(`Сервер запущен на порту ${PORT}`);
 });
