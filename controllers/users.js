@@ -1,18 +1,22 @@
-const User = require('../models/user');
+// eslint-disable-next-line import/no-unresolved
+import { compare } from 'bcryptjs';
+import {
+  find, findById, create, findOne, findByIdAndUpdate,
+} from '../models/user';
 
-const {
+import {
   STATUS_CREATED, STATUS_NOT_FOUND, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR,
-} = require('../utils/constants');
+} from '../utils/constants';
 
-module.exports.getAllUsers = (req, res) => {
-  User.find({})
+export function getAllUsers(req, res) {
+  find({})
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' }));
-};
+}
 
-module.exports.getUser = (req, res) => {
+export function getUser(req, res) {
   const { userId } = req.params;
-  User.findById(userId)
+  findById(userId)
     .then((user) => {
       if (!user) {
         res.status(STATUS_NOT_FOUND).send({ message: 'The requested user not found' });
@@ -29,11 +33,11 @@ module.exports.getUser = (req, res) => {
         res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error is occured' });
       }
     });
-};
+}
 
-module.exports.createUser = (req, res) => {
+export function createUser(req, res) {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  create({ name, about, avatar })
     .then((user) => res.status(STATUS_CREATED).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -44,12 +48,40 @@ module.exports.createUser = (req, res) => {
         res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
-};
+}
 
-module.exports.updateUser = (req, res) => {
+export function login(req, res) {
+  const { email, password } = req.body;
+
+  findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+
+      return compare(password, user.password);
+    })
+    // eslint-disable-next-line consistent-return
+    .then((matched) => {
+      if (!matched) {
+        // хеши не совпали — отклоняем промис
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+
+      // аутентификация успешна
+      res.send({ message: 'Всё верно!' });
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+}
+
+export function updateUser(req, res) {
   const userId = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(
+  findByIdAndUpdate(
     userId,
     { name, about },
     {
@@ -79,12 +111,12 @@ module.exports.updateUser = (req, res) => {
         res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
       }
     });
-};
+}
 
-module.exports.updateAvatar = (req, res) => {
+export function updateAvatar(req, res) {
   const userId = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(
+  findByIdAndUpdate(
     userId,
     { avatar },
     {
@@ -114,4 +146,4 @@ module.exports.updateAvatar = (req, res) => {
         res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' });
       }
     });
-};
+}

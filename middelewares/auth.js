@@ -1,0 +1,32 @@
+// eslint-disable-next-line import/no-unresolved
+import { verify } from 'jsonwebtoken';
+
+const handleAuthError = (res) => {
+  res
+    .status(401)
+    .send({ message: 'Необходима авторизация' });
+};
+
+const extractBearerToken = (header) => header.replace('Bearer ', '');
+
+// eslint-disable-next-line consistent-return
+export default (req, res, next) => {
+  const { authorization } = req.headers;
+
+  if (!authorization || !authorization.startsWith('Bearer ')) {
+    return handleAuthError(res);
+  }
+
+  const token = extractBearerToken(authorization);
+  let payload;
+
+  try {
+    payload = verify(token, 'super-strong-secret');
+  } catch (err) {
+    return handleAuthError(res);
+  }
+
+  req.user = payload; // записываем пейлоуд в объект запроса
+
+  next(); // пропускаем запрос дальше
+};
