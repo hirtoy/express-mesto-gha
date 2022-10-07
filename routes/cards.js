@@ -1,5 +1,7 @@
 const routerCards = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
+const { validate } = require('../utils/validate');
 
 const {
   getAllCards, createCard, delCard, likeCard, dislikeCard,
@@ -7,12 +9,29 @@ const {
 
 routerCards.get('/cards', auth, getAllCards);
 
-routerCards.delete('/cards/:cardId', auth, delCard);
+routerCards.delete('/cards/:cardId', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().custom(validate, 'ObjectId validation'),
+  }),
+}), auth, delCard);
 
-routerCards.put('/cards/:cardId/likes', auth, likeCard);
+routerCards.put('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().custom(validate, 'ObjectId validation'),
+  }),
+}), auth, likeCard);
 
-routerCards.delete('/cards/:cardId/likes', auth, dislikeCard);
+routerCards.delete('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().custom(validate, 'ObjectId validation'),
+  }),
+}), auth, dislikeCard);
 
-routerCards.post('/cards', auth, createCard);
+routerCards.post('/cards', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+  }),
+}), auth, createCard);
 
 module.exports = routerCards;
