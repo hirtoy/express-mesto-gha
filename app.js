@@ -5,7 +5,7 @@ const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
 const routerCards = require('./routes/cards');
-const notFoundError = require('./error/not-found-errors');
+const NotFoundError = require('./error/not-found-errors');
 const { handleError } = require('./utils/handleError');
 
 const { PORT = 3000 } = process.env;
@@ -28,7 +28,7 @@ app.use(errors());
 
 app.all('/*', () => {
   // eslint-disable-next-line new-cap
-  throw new notFoundError({ message: 'Неверный запрос' });
+  throw new NotFoundError({ message: 'Неверный запрос' });
 });
 app.use(handleError);
 

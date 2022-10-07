@@ -1,8 +1,8 @@
 const Card = require('../models/card');
-const badRequestError = require('../error/bad-request-errors');
-const notFoundError = require('../error/not-found-errors');
+const BadRequestError = require('../error/bad-request-errors');
 // eslint-disable-next-line import/no-unresolved
-const forbiddenError = require('../error/forbidden-errors');
+const ForbiddenError = require('../error/forbidden-errors');
+const NotFoundError = require('../error/not-found-errors');
 
 const {
   STATUS_CREATED, STATUS_OK,
@@ -26,7 +26,7 @@ module.exports.createCard = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line new-cap
-        next(new badRequestError('Неверные данные'));
+        next(new BadRequestError('Неверные данные'));
         return;
       }
       next(error);
@@ -40,9 +40,9 @@ module.exports.delCard = (req, res, next) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       // eslint-disable-next-line new-cap
-      if (!card) { throw new notFoundError('Карточка не найдена'); }
+      if (!card) { throw new NotFoundError('Карточка не найдена'); }
       // eslint-disable-next-line eqeqeq, new-cap
-      if (card.owner != req.user._id) { throw new forbiddenError('Вы не можете удалить чужую карточку'); }
+      if (card.owner != req.user._id) { throw new ForbiddenError('Вы не можете удалить чужую карточку'); }
       return card.remove();
     })
     .then(() => {
@@ -60,14 +60,14 @@ module.exports.likeCard = (req, res, next) => Card.findByIdAndUpdate(
   .then((card) => {
     if (!card) {
       // eslint-disable-next-line new-cap
-      throw new notFoundError('Не верный запрос');
+      throw new NotFoundError('Не верный запрос');
     }
     res.status(STATUS_CREATED).send({ data: card });
   })
   .catch((error) => {
     if (error.name === 'CastError') {
       // eslint-disable-next-line new-cap
-      next(new badRequestError('Карточка не найдена'));
+      next(new BadRequestError('Карточка не найдена'));
       return;
     }
     next(error);
@@ -82,14 +82,14 @@ module.exports.dislikeCard = (req, res, next) => Card.findByIdAndUpdate(
   .then((card) => {
     if (!card) {
       // eslint-disable-next-line new-cap
-      throw new notFoundError('Не верный запрос');
+      throw new NotFoundError('Не верный запрос');
     }
     res.status(STATUS_OK).send({ data: card });
   })
   .catch((error) => {
     if (error.name === 'CastError') {
       // eslint-disable-next-line new-cap
-      next(new badRequestError('Карточка не найдена'));
+      next(new BadRequestError('Карточка не найдена'));
       return;
     }
     next(error);

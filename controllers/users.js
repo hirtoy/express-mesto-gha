@@ -1,9 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const badRequestError = require('../error/bad-request-errors');
-const emailExistError = require('../error/email-exist-errors');
-const notFoundError = require('../error/not-found-errors');
+const BadRequestError = require('../error/bad-request-errors');
+const EmailExistError = require('../error/email-exist-errors');
+const NotFoundError = require('../error/not-found-errors');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -36,15 +36,13 @@ module.exports.getUser = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        // eslint-disable-next-line new-cap
-        throw new notFoundError({ message: 'Не верные данные пользователя' });
+        throw new NotFoundError({ message: 'Не верные данные пользователя' });
       }
       res.status(STATUS_OK).send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        // eslint-disable-next-line new-cap
-        next(new badRequestError({ message: 'Не верные данные пользователя' }));
+        next(new BadRequestError({ message: 'Не верные данные пользователя' }));
         return;
       }
       next(error);
@@ -68,13 +66,11 @@ module.exports.createUser = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        // eslint-disable-next-line new-cap
-        next(new badRequestError(error.message));
+        next(new BadRequestError(error.message));
         return;
       }
       if (error.code === 11000) {
-        // eslint-disable-next-line new-cap
-        next(new emailExistError(`Пользователь с почтой ${email} не найден`));
+        next(new EmailExistError(`Пользователь с почтой ${email} не найден`));
         return;
       }
       next(error);
@@ -95,7 +91,6 @@ module.exports.login = (req, res, next) => {
 module.exports.updateUser = (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
-  // eslint-disable-next-line no-undef
   User.findByIdAndUpdate(
     userId,
     { name, about },
@@ -106,20 +101,17 @@ module.exports.updateUser = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        // eslint-disable-next-line new-cap
-        throw new notFoundError({ message: `Пользователь ${userId} не найден` });
+        throw new NotFoundError({ message: `Пользователь ${userId} не найден` });
       }
       res.status(STATUS_OK).send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        // eslint-disable-next-line new-cap
-        next(new badRequestError({ message: 'Не верные данные пользователя' }));
+        next(new BadRequestError({ message: 'Не верные данные пользователя' }));
         return;
       }
       if (error.name === 'CastError') {
-        // eslint-disable-next-line new-cap
-        next(new badRequestError({ message: 'Не верные данные пользователя' }));
+        next(new BadRequestError({ message: 'Не верные данные пользователя' }));
       }
       next(error);
     });
@@ -138,20 +130,19 @@ module.exports.updateAvatar = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        // eslint-disable-next-line new-cap
-        throw new notFoundError({ message: `Пользователь ${userId} не найден` });
+        throw new NotFoundError({ message: `Пользователь ${userId} не найден` });
       }
       res.status(STATUS_OK).send({ data: user });
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line new-cap
-        next(new badRequestError({ message: 'Неверные данные пользователя' }));
+        next(new BadRequestError({ message: 'Неверные данные пользователя' }));
         return;
       }
       if (error.name === 'CastError') {
         // eslint-disable-next-line new-cap
-        next(new badRequestError({ message: 'Неверные данные пользователя' }));
+        next(new BadRequestError({ message: 'Неверные данные пользователя' }));
         return;
       }
       next(error);
