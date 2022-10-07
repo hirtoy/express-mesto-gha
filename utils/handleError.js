@@ -1,10 +1,10 @@
-const handleError = (err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+const handleError = (error, req, res, next) => {
+  const { statusCode = 500, message } = error;
   res
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? 'Error has occured'
+        ? 'Произошла ошибка'
         : message,
     });
   next();
