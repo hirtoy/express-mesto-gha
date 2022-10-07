@@ -1,87 +1,102 @@
-// eslint-disable-next-line import/no-unresolved
-import { compare } from 'bcryptjs';
-import {
-  find, findById, create, findOne, findByIdAndUpdate,
-} from '../models/user';
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const badRequestError = require('../error/bad-request-errors');
+const emailExistError = require('../error/email-exist-errors');
+const notFoundError = require('../error/not-found-errors');
 
-import {
-  STATUS_CREATED, STATUS_NOT_FOUND, STATUS_BAD_REQUEST, STATUS_INTERNAL_SERVER_ERROR,
-} from '../utils/constants';
+const { NODE_ENV, JWT_SECRET } = process.env;
 
-export function getAllUsers(req, res) {
-  find({})
-    .then((user) => res.send({ data: user }))
-    .catch(() => res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' }));
-}
+const {
+  STATUS_CREATED,
+  STATUS_OK,
+} = require('../utils/constants');
 
-export function getUser(req, res) {
+module.exports.getUserInfo = (req, res, next) => {
+  const { _id } = req.user;
+
+  User.find({ _id })
+    .then((user) => res.status(STATUS_OK).send({ data: user[0] }))
+    .catch((error) => {
+      throw error;
+    })
+    .catch(next);
+};
+
+module.exports.getAllUsers = (req, res, next) => {
+  User.find({})
+    .then((user) => {
+      res.status(STATUS_OK).send({ data: user });
+    })
+    .catch(next);
+};
+
+module.exports.getUser = (req, res, next) => {
   const { userId } = req.params;
-  findById(userId)
+  User.findById(userId)
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: 'The requested user not found' });
+        // eslint-disable-next-line new-cap
+        throw new notFoundError({ message: 'Не верные данные пользователя' });
+      }
+      res.status(STATUS_OK).send({ data: user });
+    })
+    .catch((error) => {
+      if (error.name === 'CastError') {
+        // eslint-disable-next-line new-cap
+        next(new badRequestError({ message: 'Не верные данные пользователя' }));
         return;
       }
-      res.send({ data: user });
+      next(error);
+    });
+};
+
+module.exports.createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create(
+      {
+        name, about, avatar, email, password: hash,
+      },
+    ))
+    .then((user) => {
+      const userWithOutPassword = user.toObject();
+      delete userWithOutPassword.password;
+      res.status(STATUS_CREATED).send(userWithOutPassword);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Id is incorrect' });
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error is occured' });
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        // eslint-disable-next-line new-cap
+        next(new badRequestError(error.message));
+        return;
       }
-    });
-}
-
-export function createUser(req, res) {
-  const { name, about, avatar } = req.body;
-  create({ name, about, avatar })
-    .then((user) => res.status(STATUS_CREATED).send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Inccorrect data passed during user creation' });
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
+      if (error.code === 11000) {
+        // eslint-disable-next-line new-cap
+        next(new emailExistError(`Пользователь с почтой ${email} не найден`));
+        return;
       }
+      next(error);
     });
-}
+};
 
-export function login(req, res) {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  findOne({ email })
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
-
-      return compare(password, user.password);
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
+      res.status(STATUS_OK).cookie('authorization', token, { maxAge: 3600000 * 24 * 7, httpOnly: true }).send({ message: 'Авторизация прошла успешно!' });
     })
-    // eslint-disable-next-line consistent-return
-    .then((matched) => {
-      if (!matched) {
-        // хеши не совпали — отклоняем промис
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
+    .catch(next);
+};
 
-      // аутентификация успешна
-      res.send({ message: 'Всё верно!' });
-    })
-    .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
-}
-
-export function updateUser(req, res) {
+module.exports.updateUser = (req, res, next) => {
   const userId = req.user._id;
   const { name, about } = req.body;
-  findByIdAndUpdate(
+  // eslint-disable-next-line no-undef
+  User.findByIdAndUpdate(
     userId,
     { name, about },
     {
@@ -91,32 +106,29 @@ export function updateUser(req, res) {
   )
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: `User ID ${userId} is not found` });
+        // eslint-disable-next-line new-cap
+        throw new notFoundError({ message: `Пользователь ${userId} не найден` });
+      }
+      res.status(STATUS_OK).send({ data: user });
+    })
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        // eslint-disable-next-line new-cap
+        next(new badRequestError({ message: 'Не верные данные пользователя' }));
         return;
       }
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Invalid data passed when updating profile' });
-      } else if (err.name === 'CastError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({
-            message: 'User ID is incorrect',
-          });
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Error has occured' });
+      if (error.name === 'CastError') {
+        // eslint-disable-next-line new-cap
+        next(new badRequestError({ message: 'Не верные данные пользователя' }));
       }
+      next(error);
     });
-}
+};
 
-export function updateAvatar(req, res) {
+module.exports.updateAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
-  findByIdAndUpdate(
+  User.findByIdAndUpdate(
     userId,
     { avatar },
     {
@@ -126,24 +138,22 @@ export function updateAvatar(req, res) {
   )
     .then((user) => {
       if (!user) {
-        res.status(STATUS_NOT_FOUND).send({ message: `Пользователь ${userId} не найден` });
+        // eslint-disable-next-line new-cap
+        throw new notFoundError({ message: `Пользователь ${userId} не найден` });
+      }
+      res.status(STATUS_OK).send({ data: user });
+    })
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        // eslint-disable-next-line new-cap
+        next(new badRequestError({ message: 'Неверные данные пользователя' }));
         return;
       }
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({ message: 'Неверные данные пользователя' });
-      } else if (err.name === 'CastError') {
-        res
-          .status(STATUS_BAD_REQUEST)
-          .send({
-            message: 'User ID is incorrect',
-          });
-      } else {
-        res.status(STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Произошла ошибка' });
+      if (error.name === 'CastError') {
+        // eslint-disable-next-line new-cap
+        next(new badRequestError({ message: 'Неверные данные пользователя' }));
+        return;
       }
+      next(error);
     });
-}
+};

@@ -1,29 +1,26 @@
-// eslint-disable-next-line import/no-unresolved
-import { verify } from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-const handleAuthError = (res) => {
-  res
-    .status(401)
-    .send({ message: 'Необходима авторизация' });
-};
+const unauthorizedError = require('../error/unauthorized-errors');
 
-const extractBearerToken = (header) => header.replace('Bearer ', '');
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 // eslint-disable-next-line consistent-return
-export default (req, res, next) => {
-  const { authorization } = req.headers;
+module.exports = (req, res, next) => {
+  const { authorization } = req.cookies;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return handleAuthError(res);
+  if (!authorization) {
+    // eslint-disable-next-line new-cap
+    throw new unauthorizedError('Необходима авторизация');
   }
 
-  const token = extractBearerToken(authorization);
+  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
-    payload = verify(token, 'super-strong-secret');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    return handleAuthError(res);
+    // eslint-disable-next-line new-cap
+    throw new unauthorizedError('Необходима авторизация');
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса

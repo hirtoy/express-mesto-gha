@@ -1,4 +1,5 @@
 const routerUser = require('express').Router();
+const auth = require('../middelewares/auth');
 
 const {
   getAllUsers,
@@ -7,13 +8,15 @@ const {
   updateAvatar,
   login,
   createUser,
+  getUserInfo,
 } = require('../controllers/users');
 
 routerUser.post('/users/signin', login);
 routerUser.post('/users/signup', createUser);
-routerUser.get('/users', getAllUsers);
+routerUser.get('/users', auth, getAllUsers);
 routerUser.get('/users/:userId', getUser);
-routerUser.patch('/users/me', updateUser);
-routerUser.patch('/users/me/avatar', updateAvatar);
+routerUser.get('/users/me', auth, getUserInfo);
+routerUser.patch('/users/me', auth, updateUser);
+routerUser.patch('/users/me/avatar', auth, updateAvatar);
 
 module.exports = routerUser;
