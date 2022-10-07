@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
 const routerUser = require('./routes/users');
 const routerCards = require('./routes/cards');
@@ -9,6 +11,8 @@ const { handleError } = require('./utils/handleError');
 const { PORT = 3000 } = process.env;
 
 const app = express();
+
+app.use(cookieParser());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,6 +24,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(routerUser);
 app.use(routerCards);
+app.use(errors());
 
 app.all('/*', () => {
   // eslint-disable-next-line new-cap
