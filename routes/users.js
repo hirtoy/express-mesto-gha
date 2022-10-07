@@ -32,13 +32,13 @@ routerUser.post('/signup', celebrate({
 
 routerUser.get('/users', auth, getAllUsers);
 
+routerUser.get('/users/me', auth, getUserInfo);
+
 routerUser.get('/users/:userId', celebrate({
   params: Joi.object().keys({
     userId: Joi.string().custom(validate, 'ObjectId validation'),
   }),
 }), auth, getUser);
-
-routerUser.get('/users/me', auth, getUserInfo);
 
 routerUser.patch('/users/me', celebrate({
   body: Joi.object().keys({

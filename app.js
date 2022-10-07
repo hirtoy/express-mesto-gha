@@ -15,7 +15,7 @@ const app = express();
 app.use(cookieParser());
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -27,7 +27,6 @@ app.use(routerCards);
 app.use(errors());
 
 app.all('/*', () => {
-  // eslint-disable-next-line new-cap
   throw new NotFoundError({ message: 'Неверный запрос' });
 });
 app.use(handleError);
