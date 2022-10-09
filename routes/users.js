@@ -2,6 +2,7 @@ const routerUser = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
 const { validate } = require('../utils/validate');
+const regexLink = require('../utils/constants');
 
 const {
   getAllUsers,
@@ -16,17 +17,17 @@ const {
 routerUser.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: false } }),
-    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
+    password: Joi.string().required(),
   }),
 }), login);
 
 routerUser.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email({ minDomainSegments: 2, tlds: { allow: false } }),
-    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+    avatar: Joi.string().pattern(regexLink),
   }),
 }), createUser);
 
@@ -49,7 +50,7 @@ routerUser.patch('/users/me', celebrate({
 
 routerUser.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(/(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/),
+    avatar: Joi.string().required().pattern(regexLink),
   }),
 }), auth, updateAvatar);
 

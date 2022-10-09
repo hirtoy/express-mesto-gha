@@ -15,7 +15,7 @@ const {
 module.exports.getUserInfo = (req, res, next) => {
   const { _id } = req.user;
 
-  User.find({ _id })
+  User.findById({ _id })
     .then((user) => res.status(STATUS_OK).send({ data: user[0] }))
     .catch(next);
 };
@@ -105,12 +105,7 @@ module.exports.updateUser = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-        return;
-      }
-      if (error.name === 'CastError') {
-        next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-      }
-      next(error);
+      } else next(error);
     });
 };
 
