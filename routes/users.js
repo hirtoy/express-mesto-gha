@@ -1,8 +1,7 @@
+const routerUser = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-// eslint-disable-next-line import/order
 const { validate } = require('../utils/validate');
 // const bodyParser = require('body-parser');
-const routerUser = require('express').Router();
 const auth = require('../middelewares/auth');
 
 const {
