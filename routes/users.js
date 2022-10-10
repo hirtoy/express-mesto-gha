@@ -1,11 +1,11 @@
-import { celebrate, Joi } from 'celebrate';
-
 import { validate } from '../utils/validate';
 // import { validateUrl } from '../utils/validateUrl';
 
 import {
   getAllUsers, getUser, updateUser, updateAvatar, login, createUser, getUserInfo,
 } from '../controllers/users';
+
+const { celebrate, Joi } = require('celebrate');
 
 const bodyParser = require('body-parser');
 
