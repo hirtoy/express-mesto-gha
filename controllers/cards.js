@@ -2,13 +2,11 @@ const Card = require('../models/card');
 const BadRequestError = require('../error/bad-request-errors');
 const ForbiddenError = require('../error/forbidden-errors');
 const NotFoundError = require('../error/not-found-errors');
-const InternalServerError = require('../error/internal-server-errors');
 
 // отображение карточек на странице
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => { throw new InternalServerError('Что-то пошло не так...'); })
     .catch(next);
 };
 
@@ -21,12 +19,10 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Невереные данные');
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+        // eslint-disable-next-line new-cap
+        next(new BadRequestError('Неверные данные'));
+      } else next(err);
+    });
 };
 
 // удаление карточки
@@ -45,11 +41,8 @@ module.exports.delCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные'));
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+      } else next(err);
+    });
 };
 
 // лайк карточки
@@ -70,11 +63,8 @@ module.exports.likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Карточка не найдена'));
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+      } else next(err);
+    });
 };
 
 // убрать лайк
@@ -94,9 +84,6 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Карточка не найдена'));
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+      } else next(err);
+    });
 };

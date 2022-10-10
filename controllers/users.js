@@ -4,8 +4,6 @@ const User = require('../models/user');
 const BadRequestError = require('../error/bad-request-errors');
 const EmailExistError = require('../error/email-exist-errors');
 const NotFoundError = require('../error/not-found-errors');
-const InternalServerError = require('../error/internal-server-errors');
-const UnauthorizedError = require('../error/unauthorized-errors');
 
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
@@ -15,17 +13,13 @@ module.exports.getUserInfo = (req, res, next) => {
         next(new BadRequestError('Не верные данные пользователя'));
       }
       next(err);
-    })
-    .catch(next);
+    });
 };
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((user) => {
       res.send({ data: user });
-    })
-    .catch(() => {
-      throw new InternalServerError('Что-то пошло не так...');
     })
     .catch(next);
 };
@@ -42,11 +36,8 @@ module.exports.getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+      } else next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -67,10 +58,8 @@ module.exports.createUser = (req, res, next) => {
         next(new BadRequestError(err.message));
       } else if (err.code === 11000) {
         next(new EmailExistError(`Пользователь с почтой ${email} не найден`));
-      }
-      next(err);
-    })
-    .catch(next);
+      } else next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -81,9 +70,6 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'dev-secret', { expiresIn: '7d' });
       res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
         .send({ message: 'Авторизация прошла успешно!' });
-    })
-    .catch(() => {
-      throw new UnauthorizedError('Неправильные почта или пароль');
     })
     .catch(next);
 };
@@ -108,11 +94,8 @@ module.exports.updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+      } else next(err);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -135,9 +118,6 @@ module.exports.updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Неверные данные пользователя' }));
-      } else {
-        throw new InternalServerError('Что-то пошло не так...');
-      }
-    })
-    .catch(next);
+      } else next(err);
+    });
 };
