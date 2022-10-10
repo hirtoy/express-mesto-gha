@@ -70,8 +70,11 @@ module.exports.likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Карточка не найдена'));
-      } else next(err);
-    });
+      } else {
+        throw new InternalServerError('Что-то пошло не так...');
+      }
+    })
+    .catch(next);
 };
 
 // убрать лайк
@@ -91,6 +94,9 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Карточка не найдена'));
-      } else next(err);
-    });
+      } else {
+        throw new InternalServerError('Что-то пошло не так...');
+      }
+    })
+    .catch(next);
 };
