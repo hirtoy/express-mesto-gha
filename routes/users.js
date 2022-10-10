@@ -1,18 +1,13 @@
-const routerUser = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
-const auth = require('../middelewares/auth');
-const { validate } = require('../utils/validate');
-const { validateUrl } = require('../utils/validateUrl');
+import { celebrate, Joi } from 'celebrate';
+import auth from '../middelewares/auth';
+import { validate } from '../utils/validate';
+import { validateUrl } from '../utils/validateUrl';
 
-const {
-  getAllUsers,
-  getUser,
-  updateUser,
-  updateAvatar,
-  login,
-  createUser,
-  getUserInfo,
-} = require('../controllers/users');
+import {
+  getAllUsers, getUser, updateUser, updateAvatar, login, createUser, getUserInfo,
+} from '../controllers/users';
+
+const routerUser = require('express').Router();
 
 routerUser.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -54,4 +49,4 @@ routerUser.patch('/users/me/avatar', celebrate({
   }),
 }), auth, updateAvatar);
 
-module.exports = routerUser;
+export default routerUser;

@@ -1,11 +1,11 @@
-const jwt = require('jsonwebtoken');
+import { verify } from 'jsonwebtoken';
 
-const UnauthorizedError = require('../error/unauthorized-errors');
+import UnauthorizedError from '../error/unauthorized-errors';
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 // eslint-disable-next-line consistent-return
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   const { authorization } = req.cookies;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
   let payload;
 
   try {
-    payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+    payload = verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (error) {
     return next(new UnauthorizedError('Необходима авторизация'));
   }

@@ -1,12 +1,13 @@
-const routerCards = require('express').Router();
-const { celebrate, Joi } = require('celebrate');
-const auth = require('../middelewares/auth');
-const { validate } = require('../utils/validate');
-const { validateUrl } = require('../utils/validateUrl');
+import { celebrate, Joi } from 'celebrate';
+import auth from '../middelewares/auth';
+import { validate } from '../utils/validate';
+import { validateUrl } from '../utils/validateUrl';
 
-const {
+import {
   getAllCards, createCard, delCard, likeCard, dislikeCard,
-} = require('../controllers/cards');
+} from '../controllers/cards';
+
+const routerCards = require('express').Router();
 
 routerCards.get('/cards', auth, getAllCards);
 
@@ -35,4 +36,4 @@ routerCards.post('/cards', celebrate({
   }),
 }), auth, createCard);
 
-module.exports = routerCards;
+export default routerCards;
