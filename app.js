@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const bodyParser = require('body-parser');
-const routerUser = require('./routes/users').default;
-const routerCards = require('./routes/cards').default;
+const routerUser = require('./routes/users');
+const routerCards = require('./routes/cards');
 const NotFoundError = require('./error/not-found-errors');
-const { handleError } = require('./utils/handleError').default;
+const { handleError } = require('./utils/handleError');
 
 const { PORT = 3000 } = process.env;
 
