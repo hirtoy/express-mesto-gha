@@ -1,7 +1,7 @@
 const Card = require('../models/card').default;
 const BadRequestError = require('../error/bad-request-errors');
 // eslint-disable-next-line import/no-unresolved
-const ForbiddenError = require('../error/forbidden-errors');
+const ForbiddenError = require('../error/forbidden-errors').default;
 const NotFoundError = require('../error/not-found-errors');
 
 const {
