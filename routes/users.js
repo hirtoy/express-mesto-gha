@@ -64,4 +64,4 @@ routerUser.patch('/users/me/avatar', celebrate({
   }),
 }), updateAvatar);
 
-export default routerUser;
+module.exports = routerUser;

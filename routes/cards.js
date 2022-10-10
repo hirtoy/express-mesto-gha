@@ -37,4 +37,4 @@ routerCards.post('/cards', celebrate({
   }),
 }), auth, createCard);
 
-export default routerCards;
+module.exports = routerCards;
