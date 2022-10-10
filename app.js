@@ -33,6 +33,6 @@ app.all('/*', auth, () => {
 app.use(handleError);
 
 app.listen(PORT, () => {
-  // eslint-disable-next-line no-undef, no-console
+  // eslint-disable-next-line no-console
   console.log(`Сервер запущен на порту ${PORT}`);
 });
