@@ -8,7 +8,7 @@ const UnauthorizedError = require('../error/unauthorized-errors');
 module.exports = (req, res, next) => {
   const { authorization } = req.cookies;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!authorization) {
     next(new UnauthorizedError('Необходима авторизация'));
     return;
   }
@@ -19,8 +19,9 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'dev-secret');
   } catch (error) {
-    // eslint-disable-next-line new-cap, consistent-return
-    return next(new UnauthorizedError('Необходима авторизация'));
+    // eslint-disable-next-line new-cap
+    next(new UnauthorizedError('Необходима авторизация'));
+    return;
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
