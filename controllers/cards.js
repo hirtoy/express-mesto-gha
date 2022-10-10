@@ -49,7 +49,7 @@ module.exports.delCard = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные'));
-      } else next(error);
+      } return next(error);
     });
 };
 
