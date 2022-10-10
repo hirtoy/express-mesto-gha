@@ -1,7 +1,7 @@
 import { celebrate, Joi } from 'celebrate';
 import auth from '../middelewares/auth';
 import { validate } from '../utils/validate';
-import { validateUrl } from '../utils/validateUrl';
+// import { validateUrl } from '../utils/validateUrl';
 
 import {
   getAllCards, createCard, delCard, likeCard, dislikeCard,
@@ -32,7 +32,7 @@ routerCards.delete('/cards/:cardId/likes', celebrate({
 routerCards.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(validateUrl),
+    link: Joi.string().required().regex(/^https?:\/\/(www)?(([a-z0-9]*\.)|([a-z0-9][a-z0-9-]*[a-z0-9]\.))+[a-z0-9]{2,}(:\d+)?(\/[a-z0-9$_.+!*'(),;:@&=-]+)+#?$/),
   }),
 }), auth, createCard);
 
