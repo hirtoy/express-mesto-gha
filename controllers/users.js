@@ -40,7 +40,6 @@ module.exports.getUser = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-        return;
       }
       next(error);
     });
@@ -64,11 +63,9 @@ module.exports.createUser = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequestError(error.message));
-        return;
       }
       if (error.code === 11000) {
         next(new EmailExistError(`Пользователь с почтой ${email} не найден`));
-        return;
       }
       next(error);
     });
@@ -128,7 +125,6 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        // eslint-disable-next-line new-cap
         next(new BadRequestError({ message: 'Неверные данные пользователя' }));
       } else next(error);
     });
