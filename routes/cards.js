@@ -31,7 +31,7 @@ routerCards.delete('/cards/:cardId/likes', celebrate({
 routerCards.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().custom(validateUrl),
+    link: Joi.string().required().pattern(validateUrl),
   }),
 }), auth, createCard);
 
