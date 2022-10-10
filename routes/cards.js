@@ -2,7 +2,6 @@ const routerCards = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
 const { validate } = require('../utils/validate');
-const { validateUrl } = require('../utils/validateUrl');
 
 const {
   getAllCards, createCard, delCard, likeCard, dislikeCard,
@@ -33,7 +32,7 @@ routerCards.post('/cards', celebrate({
     name: Joi.string().required().min(2).max(30),
     link: Joi
       .string()
-      .pattern(validateUrl)
+      .regex(/^https?:\/\/(www.){0,1}([0-9a-zA-Z_-]+\.){1,3}[a-zA-Z]+[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+#?$/m)
       .required(),
   }),
 }), auth, createCard);
