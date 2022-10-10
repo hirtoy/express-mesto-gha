@@ -10,4 +10,4 @@ const handleError = (error, req, res, next) => {
   next();
 };
 
-export default { handleError };
+module.exports = { handleError };
