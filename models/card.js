@@ -1,7 +1,7 @@
-import { Schema, model } from 'mongoose';
-import { isURL } from 'validator';
+const mongoose = require('mongoose');
+const validator = require('validator');
 
-const cardSchema = new Schema({
+const cardSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -13,18 +13,18 @@ const cardSchema = new Schema({
     required: true,
     validate: {
       validator(v) {
-        isURL(v, { require_protocol: true });
+        validator.isURL(v, { require_protocol: true });
         return /https?:\/\/(www\.)?\d?\D{1,}#?/.test(v);
       },
     },
   },
   owner: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'user',
   },
   likes: [{
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     default: [],
     ref: 'user',
   }],
@@ -34,4 +34,4 @@ const cardSchema = new Schema({
   },
 });
 
-export default model('card', cardSchema);
+module.exports = mongoose.model('card', cardSchema);
