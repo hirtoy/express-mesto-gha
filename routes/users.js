@@ -1,7 +1,7 @@
 import { celebrate, Joi } from 'celebrate';
 import auth from '../middelewares/auth';
 import { validate } from '../utils/validate';
-import { validateUrl } from '../utils/validateUrl';
+// import { validateUrl } from '../utils/validateUrl';
 
 import {
   getAllUsers, getUser, updateUser, updateAvatar, login, createUser, getUserInfo,
@@ -22,7 +22,7 @@ routerUser.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(validateUrl).required(),
+    avatar: Joi.string().pattern(/(https|http):\/\/(www.)?[a-zA-Z0-9-_]+\.[a-zA-Z]+(\/[a-zA-Z0-9-._/~:@!$&'()*+,;=]*$)?/).required(),
   }),
 }), createUser);
 
@@ -45,7 +45,7 @@ routerUser.patch('/users/me', celebrate({
 
 routerUser.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(validateUrl).required(),
+    avatar: Joi.string().required().pattern(/(https|http):\/\/(www.)?[a-zA-Z0-9-_]+\.[a-zA-Z]+(\/[a-zA-Z0-9-._/~:@!$&'()*+,;=]*$)?/).required(),
   }),
 }), auth, updateAvatar);
 
