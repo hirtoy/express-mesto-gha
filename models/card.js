@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -13,9 +12,9 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        validator.isURL(v, { require_protocol: true });
         return /https?:\/\/(www\.)?\d?\D{1,}#?/.test(v);
       },
+      message: (props) => `${props.value} неверный адрес`,
     },
   },
   owner: {
