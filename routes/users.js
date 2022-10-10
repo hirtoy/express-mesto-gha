@@ -2,7 +2,7 @@ const routerUser = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
 const { validate } = require('../utils/validate');
-// const RegExp = require('../utils/RegExp');
+const { validateUrl } = require('../utils/validateUrl');
 
 const {
   getAllUsers,
@@ -27,7 +27,7 @@ routerUser.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(/https?:\/\/(www\.)?\d?\D{1,}#?/),
+    avatar: Joi.string().custom(validateUrl),
   }),
 }), createUser);
 
@@ -50,7 +50,7 @@ routerUser.patch('/users/me', celebrate({
 
 routerUser.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().regex(/https?:\/\/(www\.)?\d?\D{1,}#?/),
+    avatar: Joi.string().required().custom(validateUrl),
   }),
 }), auth, updateAvatar);
 
