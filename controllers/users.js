@@ -89,12 +89,7 @@ module.exports.updateUser = (req, res, next) => {
       runValidators: true, // данные будут валидированы перед изменением
     },
   )
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError({ message: `Пользователь ${userId} не найден` });
-      }
-      res.send({ data: user });
-    })
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Неверные данные пользователя' }));
@@ -113,12 +108,7 @@ module.exports.updateAvatar = (req, res, next) => {
       runValidators: true,
     },
   )
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError({ message: `Пользователь ${userId} не найден` });
-      }
-      res.send({ data: user });
-    })
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Неверные данные пользователя' }));
