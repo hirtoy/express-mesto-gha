@@ -1,11 +1,17 @@
-import { validate } from '../utils/validate';
-// import { validateUrl } from '../utils/validateUrl';
-
-import {
-  getAllUsers, getUser, updateUser, updateAvatar, login, createUser, getUserInfo,
-} from '../controllers/users';
+const {
+  getAllUsers,
+  getUser,
+  updateUser,
+  updateAvatar,
+  login,
+  createUser,
+  getUserInfo,
+// eslint-disable-next-line import/order
+} = require('../controllers/users');
 
 const { celebrate, Joi } = require('celebrate');
+// eslint-disable-next-line import/order
+const { validate } = require('../utils/validate');
 
 const bodyParser = require('body-parser');
 
