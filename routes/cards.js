@@ -1,7 +1,6 @@
 const routerCards = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
-const { validate } = require('../utils/validate');
 
 const {
   getAllCards, createCard, delCard, likeCard, dislikeCard,
@@ -11,19 +10,19 @@ routerCards.get('/cards', auth, getAllCards);
 
 routerCards.delete('/cards/:cardId', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().custom(validate, 'ObjectId validation'),
+    cardId: Joi.string().hex().length(24),
   }),
 }), auth, delCard);
 
 routerCards.put('/cards/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().custom(validate, 'ObjectId validation'),
+    cardId: Joi.string().hex().length(24),
   }),
 }), auth, likeCard);
 
 routerCards.delete('/cards/:cardId/likes', celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string().custom(validate, 'ObjectId validation'),
+    cardId: Joi.string().hex().length(24),
   }),
 }), auth, dislikeCard);
 
