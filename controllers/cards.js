@@ -1,17 +1,12 @@
 const Card = require('../models/card').default;
 const BadRequestError = require('../error/bad-request-errors');
-// eslint-disable-next-line import/no-unresolved
 const ForbiddenError = require('../error/forbidden-errors');
 const NotFoundError = require('../error/not-found-errors');
-
-const {
-  STATUS_CREATED, STATUS_OK,
-} = require('../utils/constants');
 
 // отображение карточек на странице
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(STATUS_OK).send({ data: cards }))
+    .then((cards) => res.send({ data: cards }))
     .catch(next);
 };
 
@@ -21,7 +16,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner })
-    .then((cards) => res.status(STATUS_CREATED).send({ data: cards }))
+    .then((card) => res.send({ data: card }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line new-cap
@@ -34,15 +29,14 @@ module.exports.createCard = (req, res, next) => {
 module.exports.delCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      // eslint-disable-next-line new-cap
       if (!card) {
-        throw new NotFoundError('Карточка не найдена');
-      }
-      // eslint-disable-next-line eqeqeq, new-cap
-      if (card.owner != req.user._id) {
+        throw new NotFoundError('Удаление карточки с несуществующим id');
+      } else if (JSON.stringify(req.user._id) === JSON.stringify(card.owner)) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((delcard) => res.status(200).send(delcard));
+      } else {
         throw new ForbiddenError('Вы не можете удалить чужую карточку');
       }
-      return card.remove();
     })
     .catch((error) => {
       if (error.name === 'CastError') {
@@ -62,12 +56,12 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         // eslint-disable-next-line new-cap
         throw new NotFoundError('Не верный запрос');
+      } else {
+        res.send({ data: card });
       }
-      res.status(STATUS_CREATED).send({ data: card });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        // eslint-disable-next-line new-cap
         next(new BadRequestError('Карточка не найдена'));
       } else next(error);
     });
@@ -82,14 +76,13 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        // eslint-disable-next-line new-cap
         throw new NotFoundError('Не верный запрос');
+      } else {
+        res.send({ data: card });
       }
-      res.status(STATUS_OK).send({ data: card });
     })
     .catch((error) => {
       if (error.name === 'CastError') {
-        // eslint-disable-next-line new-cap
         next(new BadRequestError('Карточка не найдена'));
       } else next(error);
     });
