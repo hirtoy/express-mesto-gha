@@ -130,13 +130,6 @@ module.exports.updateAvatar = (req, res, next) => {
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line new-cap
         next(new BadRequestError({ message: 'Неверные данные пользователя' }));
-        return;
-      }
-      if (error.name === 'CastError') {
-        // eslint-disable-next-line new-cap
-        next(new BadRequestError({ message: 'Неверные данные пользователя' }));
-        return;
-      }
-      next(error);
+      } else next(error);
     });
 };

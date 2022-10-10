@@ -1,7 +1,7 @@
 const Card = require('../models/card').default;
 const BadRequestError = require('../error/bad-request-errors');
 // eslint-disable-next-line import/no-unresolved
-const ForbiddenError = require('../error/forbidden-errors').default;
+const ForbiddenError = require('../error/forbidden-errors');
 const NotFoundError = require('../error/not-found-errors');
 
 const {
@@ -26,9 +26,7 @@ module.exports.createCard = (req, res, next) => {
       if (error.name === 'ValidationError') {
         // eslint-disable-next-line new-cap
         next(new BadRequestError('Неверные данные'));
-        return;
-      }
-      next(error);
+      } else next(error);
     });
 };
 
@@ -49,7 +47,7 @@ module.exports.delCard = (req, res, next) => {
     .catch((error) => {
       if (error.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные'));
-      } return next(error);
+      } else next(error);
     });
 };
 
@@ -71,9 +69,7 @@ module.exports.likeCard = (req, res, next) => {
       if (error.name === 'CastError') {
         // eslint-disable-next-line new-cap
         next(new BadRequestError('Карточка не найдена'));
-        return;
-      }
-      next(error);
+      } else next(error);
     });
 };
 
@@ -95,8 +91,6 @@ module.exports.dislikeCard = (req, res, next) => {
       if (error.name === 'CastError') {
         // eslint-disable-next-line new-cap
         next(new BadRequestError('Карточка не найдена'));
-        return;
-      }
-      next(error);
+      } else next(error);
     });
 };
