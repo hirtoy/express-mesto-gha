@@ -1,3 +1,6 @@
+const bodyParser = require('body-parser');
+const { celebrate, Joi } = require('celebrate');
+const routerUser = require('express').Router();
 const {
   getAllUsers,
   getUser,
@@ -9,13 +12,8 @@ const {
 // eslint-disable-next-line import/order
 } = require('../controllers/users');
 
-const { celebrate, Joi } = require('celebrate');
-// eslint-disable-next-line import/order
 const { validate } = require('../utils/validate');
-
-const bodyParser = require('body-parser');
-
-const routerUser = require('express').Router();
+const { validateUrl } = require('../utils/validateUrl');
 
 routerUser.use(bodyParser.json());
 routerUser.use(bodyParser.urlencoded({ extended: true }));
@@ -34,7 +32,7 @@ routerUser.post('/signup', celebrate({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string()
-      .regex(/^https?:\/\/(www.){0,1}([0-9a-zA-Z_-]+\.){1,3}[a-zA-Z]+[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+#?$/m),
+      .pattern(validateUrl),
   }),
 }), createUser);
 
@@ -59,7 +57,7 @@ routerUser.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi
       .string()
-      .regex(/^https?:\/\/(www.){0,1}([0-9a-zA-Z_-]+\.){1,3}[a-zA-Z]+[A-Za-z0-9-._~:/?#[\]@!$&'()*+,;=]+#?$/m)
+      .pattern(validateUrl)
       .required(),
   }),
 }), updateAvatar);
