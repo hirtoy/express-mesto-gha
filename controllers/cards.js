@@ -17,11 +17,11 @@ module.exports.createCard = (req, res, next) => {
 
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
         // eslint-disable-next-line new-cap
         next(new BadRequestError('Неверные данные'));
-      } else next(error);
+      } else next(err);
     });
 };
 
@@ -38,10 +38,10 @@ module.exports.delCard = (req, res, next) => {
         throw new ForbiddenError('Вы не можете удалить чужую карточку');
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные'));
-      } else next(error);
+      } else next(err);
     });
 };
 
@@ -60,10 +60,10 @@ module.exports.likeCard = (req, res, next) => {
         res.send({ data: card });
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Карточка не найдена'));
-      } else next(error);
+      } else next(err);
     });
 };
 
@@ -81,9 +81,9 @@ module.exports.dislikeCard = (req, res, next) => {
         res.send({ data: card });
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Карточка не найдена'));
-      } else next(error);
+      } else next(err);
     });
 };

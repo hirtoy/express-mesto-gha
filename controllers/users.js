@@ -8,11 +8,11 @@ const NotFoundError = require('../error/not-found-errors');
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => res.send(user))
-    .catch((error) => {
-      if (error.name === 'CastError') {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         next(new BadRequestError('Не верные данные пользователя'));
       }
-      next(error);
+      next(err);
     });
 };
 
@@ -33,10 +33,10 @@ module.exports.getUser = (req, res, next) => {
         res.status(200).send(user);
       }
     })
-    .catch((error) => {
-      if (error.name === 'CastError') {
+    .catch((err) => {
+      if (err.name === 'CastError') {
         next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-      } else next(error);
+      } else next(err);
     });
 };
 
@@ -53,12 +53,12 @@ module.exports.createUser = (req, res, next) => {
     .then(() => res.status(200).send({
       name, about, avatar, email,
     }))
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
-        next(new BadRequestError(error.message));
-      } else if (error.code === 11000) {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError(err.message));
+      } else if (err.code === 11000) {
         next(new EmailExistError(`Пользователь с почтой ${email} не найден`));
-      } else next(error);
+      } else next(err);
     });
 };
 
@@ -91,10 +91,10 @@ module.exports.updateUser = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Не верные данные пользователя' }));
-      } else next(error);
+      } else next(err);
     });
 };
 
@@ -115,9 +115,9 @@ module.exports.updateAvatar = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch((error) => {
-      if (error.name === 'ValidationError') {
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError({ message: 'Неверные данные пользователя' }));
-      } else next(error);
+      } else next(err);
     });
 };
