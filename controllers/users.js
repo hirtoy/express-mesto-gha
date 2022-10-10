@@ -4,6 +4,7 @@ const User = require('../models/user');
 const BadRequestError = require('../error/bad-request-errors');
 const EmailExistError = require('../error/email-exist-errors');
 const NotFoundError = require('../error/not-found-errors');
+const UnauthorizedError = require('../error/unauthorized-errors');
 
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
@@ -67,9 +68,12 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'dev-secret', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
         .send({ message: 'Авторизация прошла успешно!' });
+    })
+    .catch(() => {
+      throw new UnauthorizedError('Неверные почта или пароль');
     })
     .catch(next);
 };
@@ -93,7 +97,7 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError({ message: 'Не верные данные пользователя' }));
+        next(new BadRequestError({ message: 'Неверные данные пользователя' }));
       } else next(err);
     });
 };
