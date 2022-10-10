@@ -2,7 +2,7 @@ const routerUser = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
 const { validate } = require('../utils/validate');
-const regex = require('../utils/regex');
+const RegExp = require('../utils/RegExp');
 
 const {
   getAllUsers,
@@ -27,7 +27,7 @@ routerUser.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(regex),
+    avatar: Joi.string().pattern(RegExp),
   }),
 }), createUser);
 
@@ -50,7 +50,7 @@ routerUser.patch('/users/me', celebrate({
 
 routerUser.patch('/users/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(regex),
+    avatar: Joi.string().required().pattern(RegExp),
   }),
 }), auth, updateAvatar);
 

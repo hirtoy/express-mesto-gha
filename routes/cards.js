@@ -2,7 +2,7 @@ const routerCards = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const auth = require('../middelewares/auth');
 const { validate } = require('../utils/validate');
-const regex = require('../utils/regex');
+const RegExp = require('../utils/RegExp');
 
 const {
   getAllCards, createCard, delCard, likeCard, dislikeCard,
@@ -31,7 +31,7 @@ routerCards.delete('/cards/:cardId/likes', celebrate({
 routerCards.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(regex),
+    link: Joi.string().required().pattern(RegExp),
   }),
 }), auth, createCard);
 
