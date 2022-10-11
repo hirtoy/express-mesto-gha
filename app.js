@@ -15,7 +15,7 @@ const app = express();
 app.use(cookieParser());
 
 app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -31,7 +31,4 @@ app.all('/*', () => {
 });
 app.use(handleError);
 
-app.listen(PORT, () => {
-  // eslint-disable-next-line no-undef, no-console
-  console.log(`Сервер запущен на порту ${PORT}`);
-});
+app.listen(PORT);
