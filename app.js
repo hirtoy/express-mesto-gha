@@ -27,7 +27,7 @@ app.use(routerCards);
 app.use(errors());
 
 app.all('/*', () => {
-  throw new NotFoundError({ message: 'Неверный запрос' });
+  throw new NotFoundError('Неверный запрос');
 });
 app.use(handleError);
 
